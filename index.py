@@ -15,4 +15,3 @@ except pymongo.errors.ServerSelectionTimeoutError as errorTiempo:
     print("Tiempo exedido "+errorTiempo)
 except pymongo.errors.ConnectionFailure as errorConexion:
     print("Fallo al conectarse a mongodb "+errorConexion)
-
