@@ -55,6 +55,7 @@ def dobleClickTabla(event):
     calificacion.insert(0,documento["calificacion"])
     crear["state"]="disabled"
     editar["state"]="normal"
+    borrar["state"]="normal"
 def editarRegistro():
     global ID_ALUMNO
     if len(nombre.get())!=0 and len(sexo.get())!=0 and len(calificacion.get())!=0 :
@@ -72,7 +73,21 @@ def editarRegistro():
     mostrarDatos()
     crear["state"]="normal"
     editar["state"]="disabled"
-
+    borrar["state"]="disabled"
+def borrarRegistro():
+    global ID_ALUMNO
+    try:
+        idBuscar={"_id":ObjectId(ID_ALUMNO)}
+        coleccion.delete_one(idBuscar)
+        nombre.delete(0,END)
+        sexo.delete(0,END)
+        calificacion.delete(0,END)
+    except pymongo.errors.ConnectionFailure as error:
+        print(error)
+    crear["state"]="normal"
+    editar["state"]="disabled"
+    borrar["state"]="disabled"
+    mostrarDatos()
 ventana=Tk()
 tabla=ttk.Treeview(ventana,columns=2)
 tabla.grid(row=1,column=0,columnspan=2)
@@ -98,5 +113,10 @@ crear.grid(row=5,columnspan=2)
 editar=Button(ventana,text="Editar alumno",command=editarRegistro,bg="yellow")
 editar.grid(row=6,columnspan=2)
 editar["state"]="disabled"
+#Boton borrar
+borrar=Button(ventana,text="Borrar alumno",command=borrarRegistro,bg="red",fg="white")
+borrar.grid(row=7,columnspan=2)
+borrar["state"]="disabled"
+
 mostrarDatos()
 ventana.mainloop()
