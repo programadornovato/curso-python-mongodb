@@ -2,6 +2,7 @@ from tkinter import*
 from tkinter import ttk
 from tkinter import messagebox
 import pymongo
+from bson.objectid import ObjectId
 
 MONGO_HOST="localhost"
 MONGO_PUERTO="27017"
@@ -14,6 +15,7 @@ MONGO_COLECCION="alumnos"
 cliente=pymongo.MongoClient(MONGO_URI,serverSelectionTimeoutMS=MONGO_TIEMPO_FUERA)
 baseDatos=cliente[MONGO_BASEDATOS]
 coleccion=baseDatos[MONGO_COLECCION]
+ID_ALUMNO=""
 def mostrarDatos():
     try:
         registros=tabla.get_children()
@@ -39,12 +41,30 @@ def crearRegistro():
     else:
         messagebox.showerror(message="Los campos no pueden estar vacios")
     mostrarDatos()
+def dobleClickTabla(event):
+    global ID_ALUMNO
+    ID_ALUMNO=str(tabla.item(tabla.selection())["text"])
+    #print(ID_ALUMNO)
+    documento=coleccion.find({"_id":ObjectId(ID_ALUMNO)})[0]
+    #print(documento)
+    nombre.delete(0,END)
+    nombre.insert(0,documento["nombre"])
+    sexo.delete(0,END)
+    sexo.insert(0,documento["sexo"])
+    calificacion.delete(0,END)
+    calificacion.insert(0,documento["calificacion"])
+    crear["state"]="disabled"
+    editar["state"]="normal"
+def editarRegistro():
+    crear["state"]="normal"
+    editar["state"]="disabled"
+
 ventana=Tk()
 tabla=ttk.Treeview(ventana,columns=2)
 tabla.grid(row=1,column=0,columnspan=2)
 tabla.heading("#0",text="ID")
 tabla.heading("#1",text="NOMBRE")
-
+tabla.bind("<Double-Button-1>",dobleClickTabla)
 #Nombre
 Label(ventana,text="Nombre").grid(row=2,column=0)
 nombre=Entry(ventana)
@@ -60,5 +80,9 @@ calificacion.grid(row=4,column=1)
 #Boton crear
 crear=Button(ventana,text="Crear alumno",command=crearRegistro,bg="green",fg="white")
 crear.grid(row=5,columnspan=2)
+#Boton editar
+editar=Button(ventana,text="Editar alumno",command=editarRegistro,bg="yellow")
+editar.grid(row=6,columnspan=2)
+editar["state"]="disabled"
 mostrarDatos()
 ventana.mainloop()
