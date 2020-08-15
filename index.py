@@ -56,6 +56,20 @@ def dobleClickTabla(event):
     crear["state"]="disabled"
     editar["state"]="normal"
 def editarRegistro():
+    global ID_ALUMNO
+    if len(nombre.get())!=0 and len(sexo.get())!=0 and len(calificacion.get())!=0 :
+        try:
+            idBuscar={"_id":ObjectId(ID_ALUMNO)}
+            nuevosValores={"nombre":nombre.get(),"sexo":sexo.get(),"calificacion":calificacion.get()}
+            coleccion.update(idBuscar,nuevosValores)
+            nombre.delete(0,END)
+            sexo.delete(0,END)
+            calificacion.delete(0,END)
+        except pymongo.errors.ConnectionFailure as error:
+            print(error)
+    else:
+        messagebox.showerror("Los campos no pueden estar vacios")
+    mostrarDatos()
     crear["state"]="normal"
     editar["state"]="disabled"
 
